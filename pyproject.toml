@@ -1,0 +1,16 @@
+[project]
+name = "ticagent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.1.1",
+    "dotenv>=0.9.9",
+    "fastapi>=0.141.1",
+    "fastapi-mail>=1.6.8",
+    "langchain>=1.4.0",
+    "langgraph>=1.2.11",
+    "send-mail>=0.0.2",
+    "uvicorn>=0.52.4",
+]
