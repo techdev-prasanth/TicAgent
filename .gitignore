@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+*services
+D:\learnings\ai_learning\ai_projects\TicAgent\services
+*demo.db
 # Distribution / packaging
 .Python
 build/
