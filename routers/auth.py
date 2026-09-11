@@ -10,16 +10,30 @@ from utils.security import (hash_password,
 from models.auth_models import User
 from schemas.auth_schema import (
       AccountCreation,
-      UserLogin)
+      UserLogin,
+      UserDetails)
 from sqlalchemy.orm import Session
 from db_config import Base , engine , local_session , get_session
 from fastapi.responses import JSONResponse 
 from fastapi import status
 from dotenv import load_dotenv
 
+from typing import List
+
+
 
 load_dotenv()
+
+
 router = APIRouter(prefix="/auth",tags=["auth"])
+
+@router.get("/users/",response_model=List[UserDetails])
+def get_users(user : User=Depends(get_current_user),
+               db : Session = Depends(get_session)):
+    users = db.query(User).all()
+    return users
+
+
 @router.post("/signup/")
 def create_account(request:AccountCreation,db : Session=Depends(get_session)):
 
@@ -29,7 +43,8 @@ def create_account(request:AccountCreation,db : Session=Depends(get_session)):
     user = User(
             full_name=request.full_name,
             email=request.email,
-            password=hash_password(request.password)
+            password=hash_password(request.password),
+            username=request.username
         )
     try:
             db.add(user) # stores in the session
@@ -41,7 +56,8 @@ def create_account(request:AccountCreation,db : Session=Depends(get_session)):
     except Exception as e:
             return JSONResponse(
                   content={"messages":"Account has not been created"},
-                  status_code=status.HTTP_201_CREATED)
+                  status_code=status.HTTP_400_BAD_REQUEST
+                  )
 
 
 
@@ -50,10 +66,12 @@ def user_login(request: OAuth2PasswordRequestForm = Depends() , db : Session = D
 
     check_user = db.query(User).filter(User.username==request.username).first()
 
-    if check_user:
+    if check_user is None:
+   
         return HTTPException(detail="email or password is incorrect",status_code=status.HTTP_400_BAD_REQUEST)
 
     if not verify_password(request.password,check_user.password):
+      
         return HTTPException(detail="email or password is incorrect",status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -61,4 +79,5 @@ def user_login(request: OAuth2PasswordRequestForm = Depends() , db : Session = D
     referesh_token = create_refresh_token({"sub":check_user.email})
 
     return JSONResponse(content={"access":access_token,"message":"login successfull"},status_code=status.HTTP_200_OK)
+
 

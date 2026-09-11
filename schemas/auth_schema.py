@@ -1,4 +1,12 @@
-from pydantic import BaseModel , EmailStr , Field , validator , field_validator , model_validator
+from pydantic import (BaseModel ,
+                    EmailStr ,
+                    Field ,
+                    field_validator ,
+                    model_validator ,
+                    ConfigDict
+)
+
+from typing import List , Optional
 
 
 class AccountCreation(BaseModel):
@@ -22,3 +30,10 @@ class UserLogin(BaseModel):
     email : EmailStr
     password : str = Field(min_length=8,max_length=16,description="users password")
 
+class UserDetails(BaseModel):
+    id : int
+    username : Optional[str] = None
+    email : EmailStr
+    full_name : str
+
+    model_config = ConfigDict(from_attributes=True)
