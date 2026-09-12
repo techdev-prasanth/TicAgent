@@ -37,3 +37,7 @@ class UserDetails(BaseModel):
     full_name : str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CheckAge(BaseModel):
+    age : int

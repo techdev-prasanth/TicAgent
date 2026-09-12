@@ -11,7 +11,8 @@ from models.auth_models import User
 from schemas.auth_schema import (
       AccountCreation,
       UserLogin,
-      UserDetails)
+      UserDetails,
+      CheckAge)
 from sqlalchemy.orm import Session
 from db_config import Base , engine , local_session , get_session
 from fastapi.responses import JSONResponse 
@@ -27,11 +28,7 @@ load_dotenv()
 
 router = APIRouter(prefix="/auth",tags=["auth"])
 
-@router.get("/users/",response_model=List[UserDetails])
-def get_users(user : User=Depends(get_current_user),
-               db : Session = Depends(get_session)):
-    users = db.query(User).all()
-    return users
+
 
 
 @router.post("/signup/")
@@ -79,5 +76,7 @@ def user_login(request: OAuth2PasswordRequestForm = Depends() , db : Session = D
     referesh_token = create_refresh_token({"sub":check_user.email})
 
     return JSONResponse(content={"access":access_token,"message":"login successfull"},status_code=status.HTTP_200_OK)
+
+
 
 
