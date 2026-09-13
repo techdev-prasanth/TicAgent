@@ -18,7 +18,7 @@ def get_category(session : Session = Depends(get_session)):
     return data
 
 
-@router.post("/category")
+@router.post("/category/")
 def create_category(request:TicketCategorySchema, 
                     session : Session= Depends(get_session)):
 

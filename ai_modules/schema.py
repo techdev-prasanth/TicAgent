@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field , ConfigDict
 from typing import List, Optional
 from datetime import datetime
 
@@ -28,13 +28,11 @@ class TicketCategorySchema(BaseModel):
 
 class TicketCategoryResponse(TicketCategorySchema):
     id : int
-    is_active : bool
-    create_ad : datetime
-    updated_at : datetime
+    created_at : Optional[datetime] | None
+    updated_at : Optional[datetime] | None
 
 
-    class Config:
-        model_config = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TicketPriority(str, Enum):
@@ -62,8 +60,11 @@ class TicketCreate(BaseModel):
 
 
 
-    
-
+class TicketClassfication(BaseModel):
+    category_code : str = Field(description="Selected category code from the allowed list")
+    priority : TicketPriority = Field(description="Assessed priority level based on customer message urgency")
+    sentiment : TicketSentiment = Field(description="Customer emotion/sentiment detected in the message")
+    description : str = Field(description="Brief explanation for the assigned classification, priority, and sentiment")
 
 
 
