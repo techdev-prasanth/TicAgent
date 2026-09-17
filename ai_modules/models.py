@@ -5,7 +5,6 @@ from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column ,relationship
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from models.auth_models import User
 
 class TicketCategory(Base):
     __tablename__ = "ticketcategories"
@@ -38,11 +37,16 @@ class Ticket(Base):
     customer_message : Mapped[str] = mapped_column(Text)
     category_code : Mapped[str | None] = mapped_column(String(100))
     consent_given : Mapped[str | None] = mapped_column(String(100))
+    priority : Mapped[str | None] = mapped_column(String(100))
+
+    description : Mapped[str | None] = mapped_column(Text)
 
     created_at : Mapped[datetime] = mapped_column(DateTime,default=datetime.now)
     updated_at : Mapped[datetime] = mapped_column(DateTime,default=datetime.now,onupdate=datetime.now)
 
 
+
+    customer : Mapped["User"] = relationship("User",back_populates="tickets")
 
     def __str__(self):
         return str(self.id)

@@ -9,6 +9,8 @@ __pycache__/
 *services
 D:\learnings\ai_learning\ai_projects\TicAgent\services
 *demo.db
+*\migrations
+*migrations
 # Distribution / packaging
 .Python
 build/

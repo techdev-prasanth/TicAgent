@@ -1,9 +1,11 @@
-from sqlalchemy import Column , String , Integer  , DateTime , func
+from sqlalchemy import Column , String , Integer  , DateTime , func 
+from sqlalchemy.orm import relationship
 from db_config import engine,local_session,Base
 import uuid
 from sqlalchemy.orm import Mapped , mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
+from ai_modules.models import Ticket
 class User(Base):
     __tablename__ = "users"
 
@@ -15,6 +17,7 @@ class User(Base):
 
 
 
+    tickets : Mapped["Ticket"] = relationship("Ticket",back_populates="customer",cascade="all , delete-orphan")
     
     created_at : Mapped[datetime] = mapped_column(
         DateTime,

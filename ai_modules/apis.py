@@ -7,6 +7,11 @@ from fastapi.responses import JSONResponse
 from fastapi import status
 import uuid
 from sqlalchemy.orm import Session
+from ai_modules.agents import workflow
+import asyncio
+from sqlalchemy.ext.asyncio import AsyncSession
+from utils.security import get_current_user
+
 router  =APIRouter(prefix="/api/v1/tickets")
 
 
@@ -74,16 +79,45 @@ def create_ticket(request: TicketCreate,session : Session = Depends(get_session)
         return JSONResponse(content=f"There is a problem with creation {e}",status_code=status.HTTP_400_BAD_REQUEST)  
 
 
-@router.get("/users-tickets/{user_uuid}")
-def fetch_users_tickets(user_uuid: uuid.UUID,session : Session = Depends(get_session)):
-    print()
-    print("UUID",user_uuid)
+@router.get("/users-tickets/")
+def fetch_users_tickets(session : Session = Depends(get_session),user : User = Depends(get_current_user)):
+     
     tickets = (
         session.query(Ticket)
-        .filter(User.id==user_uuid)
+        .filter(Ticket.customer_id == user.id)
         .order_by(Ticket.created_at.desc())
         .all()
     )
-
-    return tickets
+    return {
+        "message":"fetched",
+        "data":tickets
+    }
     
+
+@router.post("/messages")
+async def customer_email(request: CustomerMessage, session: AsyncSession = Depends(get_session),user : User =  Depends(get_current_user)):
+
+
+    # state = {"customer_message":request.message}
+
+    db_gen = get_session()
+    db = next(db_gen)
+
+    config = {
+        "configurable":{
+            "db" : db
+        }
+    }   
+
+    print("User",user)
+
+    result = await workflow.ainvoke(
+        {
+            "customer_message":request.message,
+            "customer_id":user.id
+
+            },
+        config=config)
+
+    return result
+

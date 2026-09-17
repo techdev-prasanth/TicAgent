@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field , ConfigDict
 from typing import List, Optional
 from datetime import datetime
+import uuid
 
 #Account & Login
 #Billing & Payments
@@ -27,7 +28,7 @@ class TicketCategorySchema(BaseModel):
 
 
 class TicketCategoryResponse(TicketCategorySchema):
-    id : int
+    id : uuid.UUID
     created_at : Optional[datetime] | None
     updated_at : Optional[datetime] | None
     model_config = ConfigDict(from_attributes=True)
@@ -68,5 +69,3 @@ class TicketClassfication(BaseModel):
 
 class CustomerMessage(BaseModel):
     message : str = Field(description="it contains customer message")
-    category_code : str
-    consent_given : str
