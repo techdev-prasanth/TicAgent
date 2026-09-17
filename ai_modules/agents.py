@@ -13,8 +13,8 @@ from sqlalchemy import text , select
 from db_config import  get_session
 from sqlalchemy.orm import Session 
 from fastapi import Depends , APIRouter
-from models import TicketCategory , Ticket
-from schema import TicketCategoryResponse , TicketClassfication
+from ai_modules.models import TicketCategory , Ticket
+from ai_modules.schema import TicketCategoryResponse , TicketClassfication
 import uuid
 from langchain_core.runnables import RunnableConfig
 load_dotenv()
@@ -46,6 +46,8 @@ def santize_content(state: State):
     flag = any(i.lower() in customer_message for i in BLACKLISTED_WORDS) 
     return {"flag":flag}
 
+
+# async def fetch_user(user_id: int,)
 
 def sanitize_router(state: State):
     print()
@@ -98,12 +100,18 @@ def create_ticket(state : State, config: RunnableConfig):
 
     response = state["classification"]
 
-    Ticket(
+    ticket = Ticket(
         customer_id = str(uuid.uuid4),
         customer_message = state["customer_message"],
-        category_code = state[""]
-        consent_given
+        consent_given = response
     )
+
+    db.add(ticket)
+    db.commit()
+    db.refresh(ticket)
+
+    print("Ticket has been created")
+    return "Added"
 
 
 builder = StateGraph(State)
@@ -111,6 +119,7 @@ builder = StateGraph(State)
 builder.add_node("santize_content",santize_content)
 builder.add_node("reject_message",reject_message)
 builder.add_node("classify_customer_mail",classify_customer_mail)
+builder.add_node("create_ticket",create_ticket)
 
 
 
@@ -122,6 +131,7 @@ builder.add_conditional_edges("santize_content",
                     "reject": "reject_message"})
 
 builder.add_edge("classify_customer_mail",END)
+builder.add_edge("create_ticket",END)
 builder.add_edge("reject_message",END)
 
 
@@ -143,8 +153,12 @@ app = builder.compile()
 db_gen = get_session()
 db = next(db_gen)
 
-try:
-    app.invoke({"customer_message":email},config={"configurable":{"db":db}})
 
-finally:
-    db_gen.close()
+
+
+
+if __name__ == "__main__":
+    try:
+        app.invoke({"customer_message":email},config={"configurable":{"db":db}})
+    finally:
+        db_gen.close()

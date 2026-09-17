@@ -3,14 +3,15 @@ from pydantic import (BaseModel ,
                     Field ,
                     field_validator ,
                     model_validator ,
-                    ConfigDict
+                    ConfigDict,
+                    UUID4
 )
 
 from typing import List , Optional
-
+import uuid
 
 class AccountCreation(BaseModel):
-    full_name : str = Field(max_length=20, min_length=2)
+    fullname : str = Field(max_length=20, min_length=2)
     email : EmailStr
     username : str 
     password : str = Field(min_length=8,max_length=16,description="users password")
@@ -31,13 +32,15 @@ class UserLogin(BaseModel):
     password : str = Field(min_length=8,max_length=16,description="users password")
 
 class UserDetails(BaseModel):
-    id : int
+    id : UUID4
     username : Optional[str] = None
     email : EmailStr
-    full_name : str
+    fullname : str
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class CheckAge(BaseModel):
     age : int
+
+

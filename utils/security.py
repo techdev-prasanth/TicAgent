@@ -6,6 +6,7 @@ from fastapi import Depends , HTTPException
 from sqlalchemy.orm import Session
 from db_config import get_session
 from models.auth_models import User
+from fastapi import status
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -61,16 +62,16 @@ def get_current_user(token : str = Depends(oauth2_scheme),
         email = payload.get("sub")
 
         if email is None:
-            raise HTTPException(detail="Invalid credentials")
+            raise HTTPException(detail="Invalid credentials",status_code=status.HTTP_400_BAD_REQUEST)
 
     except JWTError:
-        raise HTTPException(detail="Invalid credentials")
+        raise HTTPException(detail="Invalid credentials",status_code=status.HTTP_400_BAD_REQUEST)
 
 
     user = db.query(User).filter(User.email==email).first()
 
     if user is None:
-        raise HTTPException(detail="Invalid credentials")
+        raise HTTPException(detail="Invalid credentials",status_code=status.HTTP_400_BAD_REQUEST)
 
 
     return user

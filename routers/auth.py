@@ -26,7 +26,7 @@ from typing import List
 load_dotenv()
 
 
-router = APIRouter(prefix="/auth",tags=["auth"])
+router = APIRouter(prefix="/api/v1/auth",tags=["auth"])
 
 
 
@@ -38,7 +38,7 @@ def create_account(request:AccountCreation,db : Session=Depends(get_session)):
     if existing_user:
         return HTTPException(detail="Account exist already",status_code=status.HTTP_400_BAD_REQUEST)
     user = User(
-            full_name=request.full_name,
+            fullname=request.fullname,
             email=request.email,
             password=hash_password(request.password),
             username=request.username
@@ -51,6 +51,7 @@ def create_account(request:AccountCreation,db : Session=Depends(get_session)):
                   content={"messages":"Account has been created"},
                   status_code=status.HTTP_201_CREATED)
     except Exception as e:
+            print("Erroe",e)
             return JSONResponse(
                   content={"messages":"Account has not been created"},
                   status_code=status.HTTP_400_BAD_REQUEST

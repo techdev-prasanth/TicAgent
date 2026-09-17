@@ -30,8 +30,6 @@ class TicketCategoryResponse(TicketCategorySchema):
     id : int
     created_at : Optional[datetime] | None
     updated_at : Optional[datetime] | None
-
-
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -68,5 +66,7 @@ class TicketClassfication(BaseModel):
 
 
 
-
-
+class CustomerMessage(BaseModel):
+    message : str = Field(description="it contains customer message")
+    category_code : str
+    consent_given : str
