@@ -1,4 +1,4 @@
-from sqlalchemy import Column , Integer, String , DateTime  , Text  , ForeignKey
+from sqlalchemy import Column , Integer, String , DateTime  , Text  , ForeignKey , Enum
 from sqlalchemy.orm import relationship
 from db_config import Base
 from datetime import datetime
@@ -37,7 +37,8 @@ class Ticket(Base):
     customer_message : Mapped[str] = mapped_column(Text)
     category_code : Mapped[str | None] = mapped_column(String(100))
     consent_given : Mapped[str | None] = mapped_column(String(100))
-    priority : Mapped[str | None] = mapped_column(String(100))
+    priority : Mapped[Enum | None] = mapped_column(String(100))
+    sentiment : Mapped[Enum | None] = mapped_column(String(100))
 
     description : Mapped[str | None] = mapped_column(Text)
 

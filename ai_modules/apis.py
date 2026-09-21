@@ -6,20 +6,50 @@ from models.auth_models import User
 from fastapi.responses import JSONResponse
 from fastapi import status
 import uuid
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session 
+from sqlalchemy import select
 from ai_modules.agents import workflow
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils.security import get_current_user
+from ai_modules.tasks import proccess_message
+from utils.dependencies import get_redis , get_redis_client
+import redis.asyncio as redis
+import json
+from async_db_config import get_async_session
+
+
 
 router  =APIRouter(prefix="/api/v1/tickets")
 
 
+redis_client = None
 
 @router.get("/categories/")
-def get_category(session : Session = Depends(get_session)):
-    data = session.query(TicketCategory).all()
-    return data
+async def get_category(session : Session = Depends(get_session),
+                cache = Depends(get_redis)):
+
+    KEY , TTL = "categories:all" , 300
+
+
+    if cache:
+        try:
+            cached = await cache.get(KEY)
+            if cached:
+                print("comes from cahce")
+                return json.loads(cached)
+
+        except redis.RedisError as e:
+            return {
+                "message":f"cache is error {e}"
+            }
+
+    result = session.execute(select(TicketCategory))
+    payload = [TicketCategoryResponse.model_validate(c).model_dump(mode="json") for c in result.scalars().all() ]
+
+    await cache.set(KEY,json.dumps(payload), ex=TTL)
+
+    return payload
 
 @router.post("/categories/")
 def create_category(request:TicketCategorySchema, 
@@ -95,29 +125,23 @@ def fetch_users_tickets(session : Session = Depends(get_session),user : User = D
     
 
 @router.post("/messages")
-async def customer_email(request: CustomerMessage, session: AsyncSession = Depends(get_session),user : User =  Depends(get_current_user)):
+async def customer_email(request: CustomerMessage, session: AsyncSession = Depends(get_async_session),
+                         user : User =  Depends(get_current_user),
+                         cache = Depends(get_redis)):
 
 
     # state = {"customer_message":request.message}
 
-    db_gen = get_session()
-    db = next(db_gen)
+    # db_gen = session
+    # db = next(db_gen)
 
-    config = {
-        "configurable":{
-            "db" : db
-        }
-    }   
-
+  
     print("User",user)
+    task = proccess_message.delay(message=request.message,user_id=user.id)
 
-    result = await workflow.ainvoke(
-        {
-            "customer_message":request.message,
-            "customer_id":user.id
-
-            },
-        config=config)
-
-    return result
+    return {
+        "status": "processing",
+        "task_id": task.id,
+        "message": "Message sent to background queue successfully."
+    }
 

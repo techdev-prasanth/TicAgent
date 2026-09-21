@@ -53,18 +53,17 @@ class TicketCreate(BaseModel):
     customer_id: str = Field(example="CUST-1042",description="it denotes the customer's id")
     customer_message: str = Field(example="I was double charged for my subscription",description="customers questions")
     category_code: str = Field(example="BILLING_PAYMENT")
-    consent_given: bool = Field(True, description="Customer consent for LLM processing")
-
-
-
-
-
+    consent_given: str = Field(True, description="Customer consent for LLM processing")
+    priority : TicketPriority = Field(description="Assessed priority level based on customer message urgency")
+    sentiment : TicketSentiment = Field(description="Customer emotion/sentiment detected in the message")
+ 
 class TicketClassfication(BaseModel):
     category_code : str = Field(description="Selected category code from the allowed list")
     priority : TicketPriority = Field(description="Assessed priority level based on customer message urgency")
     sentiment : TicketSentiment = Field(description="Customer emotion/sentiment detected in the message")
     description : str = Field(description="Brief explanation for the assigned classification, priority, and sentiment")
-
+    human_escalation : bool
+    consent_given : str 
 
 
 class CustomerMessage(BaseModel):

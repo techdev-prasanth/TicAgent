@@ -9,7 +9,7 @@ load_dotenv(override=True)
 
 DB_URL = os.getenv("DB_URL")
 print("DB",DB_URL)
-engine = create_engine(DB_URL)
+engine = create_engine(DB_URL,pool_size=5,max_overflow=100)
 
 local_session  = sessionmaker(bind=engine,autoflush=True,autocommit=False)
 

@@ -6,6 +6,8 @@ from sqlalchemy.orm import Mapped , mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from ai_modules.models import Ticket
+
+
 class User(Base):
     __tablename__ = "users"
 
