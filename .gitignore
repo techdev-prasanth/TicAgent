@@ -55,7 +55,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-
+client_secret.json
 # Translations
 *.mo
 *.pot

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped , mapped_column 
-from db_config import get_session ,Base
+from database.db_config import get_session ,Base
 from sqlalchemy import String , Integer , Text , ForeignKey 
 from sqlalchemy.dialects.postgresql import UUID
 import uuid

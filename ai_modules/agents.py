@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from typing import TypedDict
 from sqlalchemy import text , select
-from db_config import  get_session
+from database.db_config import  get_session
 from sqlalchemy.orm import Session 
 from fastapi import Depends , APIRouter
 from ai_modules.models import TicketCategory , Ticket
@@ -19,7 +19,7 @@ from langgraph.prebuilt import ToolNode , tools_condition
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from async_db_config import async_session
+from database.async_db_config import async_session
 
 import redis.asyncio as redis
 

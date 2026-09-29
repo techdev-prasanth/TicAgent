@@ -1,7 +1,7 @@
 from worker import celery_app
 from ai_modules.agents import workflow
 from ai_modules.schema import CustomerMessage
-from async_db_config import AsyncSession , async_engine , async_session , get_async_session
+from database.async_db_config import AsyncSession , async_engine , async_session , get_async_session
 from models.auth_models import User
 from utils.security import get_current_user
 import asyncio

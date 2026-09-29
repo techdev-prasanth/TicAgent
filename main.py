@@ -3,13 +3,53 @@ from routers.auth import router as auth_router
 from routers.users import router as users_router
 from ai_modules.apis import router as ai_router
 from ai_modules.agents import router as agents_router
-from db_config import Base, engine
+from routers.gmail_api import router as gmail_router
+from database.db_config import Base, engine
 import asyncio
 from contextlib import asynccontextmanager
-
 import redis.asyncio as redis
+import os
+from fastapi import FastAPI
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 
+
+resource = Resource(attributes={SERVICE_NAME: "fastapi-service"})
+
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+
+resource = Resource(
+    attributes={
+        SERVICE_NAME: "ticagent-fastapi"
+    }
+)
+
+otlp_exporter = OTLPSpanExporter(
+    endpoint="http://localhost:4318/v1/traces",
+)
+
+provider = TracerProvider(
+    resource=resource
+)
+
+processor = BatchSpanProcessor(
+    otlp_exporter
+)
+
+provider.add_span_processor(processor)
+
+trace.set_tracer_provider(provider)
 redis_client = None
 
 @asynccontextmanager
@@ -40,12 +80,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+FastAPIInstrumentor.instrument_app(app)
+
 
 # Register your router globally
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(ai_router)
 app.include_router(agents_router)
+app.include_router(gmail_router)
 
 @app.get("/")
 def root():

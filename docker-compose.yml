@@ -1,0 +1,112 @@
+services:
+
+  # ============================================================
+  # OpenTelemetry Collector
+  # ============================================================
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+
+    command:
+      - "--config=/etc/otelcol-contrib/otel-collector-config.yaml"
+
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otelcol-contrib/otel-collector-config.yaml
+
+    ports:
+      # OTLP gRPC - your FastAPI app can send telemetry here
+      - "4317:4317"
+
+      # OTLP HTTP - your FastAPI app can send telemetry here
+      - "4318:4318"
+
+    depends_on:
+      - prometheus
+      - tempo
+
+
+  # ============================================================
+  # Prometheus - Metrics
+  # ============================================================
+  prometheus:
+    image: prom/prometheus:latest
+
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+    ports:
+      - "9090:9090"
+
+
+  # ============================================================
+  # Loki - Logs
+  # ============================================================
+  loki:
+    image: grafana/loki:latest
+
+    command:
+      - "-config.file=/etc/loki/loki-config.yaml"
+
+    volumes:
+      - ./config/loki-config.yaml:/etc/loki/loki-config.yaml
+      - loki_data:/loki
+
+    ports:
+      - "3100:3100"
+
+
+  # ============================================================
+  # Tempo - Traces
+  # ============================================================
+  tempo:
+    image: grafana/tempo:latest
+
+    command:
+      - "-config.file=/etc/tempo/tempo.yaml"
+
+    volumes:
+      - ./config/tempo.yaml:/etc/tempo/tempo.yaml
+      - tempo_data:/var/tempo
+
+    ports:
+      # Tempo HTTP API
+      - "3200:3200"
+
+    depends_on:
+      - loki
+
+
+  # ============================================================
+  # Grafana - Visualization
+  # ============================================================
+  grafana:
+    image: grafana/grafana:latest
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+
+
+# ================================================================
+# Persistent Docker volumes
+# ================================================================
+
+volumes:
+
+  prometheus_data:
+
+  loki_data:
+
+  tempo_data:
+
+  grafana_data:

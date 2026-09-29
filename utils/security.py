@@ -4,7 +4,7 @@ from jose import JWTError , jwt
 from datetime import datetime , timezone , timedelta
 from fastapi import Depends , HTTPException
 from sqlalchemy.orm import Session
-from db_config import get_session
+from database.db_config import get_session
 from models.auth_models import User
 from fastapi import status
 

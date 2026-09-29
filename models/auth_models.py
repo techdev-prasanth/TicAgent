@@ -1,6 +1,6 @@
 from sqlalchemy import Column , String , Integer  , DateTime , func 
 from sqlalchemy.orm import relationship
-from db_config import engine,local_session,Base
+from database.db_config import engine,local_session,Base
 import uuid
 from sqlalchemy.orm import Mapped , mapped_column
 from sqlalchemy.dialects.postgresql import UUID

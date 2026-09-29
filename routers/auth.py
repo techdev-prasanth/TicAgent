@@ -14,7 +14,7 @@ from schemas.auth_schema import (
       UserDetails,
       CheckAge)
 from sqlalchemy.orm import Session
-from db_config import Base , engine , local_session , get_session
+from database.db_config import Base , engine , local_session , get_session
 from fastapi.responses import JSONResponse 
 from fastapi import status
 from dotenv import load_dotenv

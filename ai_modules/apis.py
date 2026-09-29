@@ -1,6 +1,6 @@
 from fastapi import APIRouter , Depends
 from .schema import TicketCategorySchema , TicketCategoryResponse , CustomerMessage , TicketCreate
-from db_config import get_session
+from database.db_config import get_session
 from ai_modules.models import TicketCategory , Ticket 
 from models.auth_models import User
 from fastapi.responses import JSONResponse
@@ -16,7 +16,7 @@ from ai_modules.tasks import proccess_message
 from utils.dependencies import get_redis , get_redis_client
 import redis.asyncio as redis
 import json
-from async_db_config import get_async_session
+from database.async_db_config import get_async_session
 
 
 
